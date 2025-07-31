@@ -1,10 +1,10 @@
 # 🤖 MCP Server Gemini
 
-[![npm version](https://badge.fury.io/js/mcp-server-gemini.svg)](https://badge.fury.io/js/mcp-server-gemini)
+<!-- [![npm version](https://badge.fury.io/js/mcp-server-gemini.svg)](https://badge.fury.io/js/mcp-server-gemini) -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![CI](https://github.com/gurr-i/mcp-server-gemini/workflows/CI/badge.svg)](https://github.com/gurr-i/mcp-server-gemini/actions)
+<!-- [![CI](https://github.com/gurr-i/mcp-server-gemini/workflows/CI/badge.svg)](https://github.com/gurr-i/mcp-server-gemini/actions) -->
 
 A **state-of-the-art Model Context Protocol (MCP) server** that provides seamless integration with Google's Gemini AI models. This server enables Claude Desktop and other MCP-compatible clients to leverage the full power of Gemini's advanced AI capabilities.
 
