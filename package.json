@@ -1,0 +1,82 @@
+{
+  "name": "mcp-server-gemini",
+  "version": "1.0.0",
+  "description": "A state-of-the-art Model Context Protocol (MCP) server that provides seamless integration with Google's Gemini AI models. This server enables Claude Desktop and other MCP-compatible clients to leverage the full power of Gemini's advanced AI capabilities.",
+  "main": "dist/enhanced-stdio-server.js",
+  "bin": {
+    "mcp-server-gemini": "./dist/enhanced-stdio-server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "prepare": "npm run build",
+    "start": "node dist/enhanced-stdio-server.js",
+    "dev": "node --loader ts-node/esm src/enhanced-stdio-server.ts",
+    "dev:watch": "nodemon --exec \"node --loader ts-node/esm src/enhanced-stdio-server.ts\" --ext ts --watch src/",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:integration": "jest --testPathPattern=integration",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint && npm run test",
+    "prepack": "npm run validate && npm run build",
+    "release": "npm run validate && npm run build && npm publish"
+  },
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^1.8.0",
+    "dotenv": "^16.4.5",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.5.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.0.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "gemini",
+    "google-gemini",
+    "ai",
+    "llm",
+    "claude-desktop",
+    "cursor",
+    "windsurf",
+    "typescript"
+  ],
+  "author": "Gurveer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gurr-i/mcp-server-gemini-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gurr-i/mcp-server-gemini/issues"
+  },
+  "homepage": "https://github.com/gurr-i/mcp-server-gemini#readme",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
+}

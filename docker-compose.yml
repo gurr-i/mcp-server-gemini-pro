@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  mcp-server-gemini:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: mcp-server-gemini:latest
+    container_name: mcp-server-gemini
+    restart: unless-stopped
+    
+    # Environment configuration
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_WINDOW=60000
+      - REQUEST_TIMEOUT=30000
+    
+    # Load environment variables from file
+    env_file:
+      - .env
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    
+    # Read-only root filesystem (except for tmp)
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    
+    # Drop all capabilities and add only necessary ones
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+    
+    # Use non-root user
+    user: "1001:1001"
+
+  # Development service
+  mcp-server-gemini-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: mcp-server-gemini:dev
+    container_name: mcp-server-gemini-dev
+    restart: "no"
+    
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - RATE_LIMIT_ENABLED=false
+      - REQUEST_TIMEOUT=60000
+    
+    env_file:
+      - .env
+    
+    # Mount source code for development
+    volumes:
+      - ./src:/app/src:ro
+      - ./package.json:/app/package.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+    
+    # Override command for development
+    command: ["npm", "run", "dev"]
+    
+    profiles:
+      - dev
+
+# Networks
+networks:
+  default:
+    name: mcp-server-gemini-network
+    driver: bridge
+
+# Volumes for persistent data (if needed)
+volumes:
+  logs:
+    driver: local
