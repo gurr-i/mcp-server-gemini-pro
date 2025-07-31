@@ -4,14 +4,14 @@ export enum LogLevel {
   ERROR = 0,
   WARN = 1,
   INFO = 2,
-  DEBUG = 3,
+  DEBUG = 3
 }
 
 const LOG_LEVEL_MAP: Record<string, LogLevel> = {
   error: LogLevel.ERROR,
   warn: LogLevel.WARN,
   info: LogLevel.INFO,
-  debug: LogLevel.DEBUG,
+  debug: LogLevel.DEBUG
 };
 
 class Logger {
@@ -30,7 +30,7 @@ class Logger {
   private log(level: LogLevel, levelName: string, message: string, meta?: any): void {
     if (level <= this.currentLevel) {
       const formattedMessage = this.formatMessage(levelName, message, meta);
-      
+
       // Use stderr for logging to avoid interfering with MCP protocol on stdout
       if (level === LogLevel.ERROR) {
         console.error(formattedMessage);

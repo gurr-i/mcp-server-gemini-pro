@@ -58,10 +58,8 @@ export class RateLimiter {
         limit: this.maxRequests,
         resetIn
       });
-      
-      throw new RateLimitError(
-        `Rate limit exceeded. Try again in ${resetIn} seconds.`
-      );
+
+      throw new RateLimitError(`Rate limit exceeded. Try again in ${resetIn} seconds.`);
     }
 
     entry.count++;

@@ -5,13 +5,7 @@ import { MCPRequest, MCPResponse } from './types.js';
 import { config } from './config/index.js';
 import { logger } from './utils/logger.js';
 import { rateLimiter } from './utils/rateLimiter.js';
-import {
-  MCPError,
-  ValidationError,
-  AuthenticationError,
-  ErrorHandler,
-  withRetry
-} from './utils/errors.js';
+import { MCPError, ValidationError } from './utils/errors.js';
 import { Validator, ToolSchemas } from './utils/validation.js';
 
 // Increase max buffer size for large images (10MB)
@@ -40,7 +34,7 @@ const GEMINI_MODELS = {
     contextWindow: 1000000,
     thinking: true
   },
-  
+
   // 2.0 series
   'gemini-2.0-flash': {
     description: 'Fast, efficient model with 1M context window',
@@ -57,7 +51,7 @@ const GEMINI_MODELS = {
     features: ['function_calling', 'json_mode', 'grounding', 'system_instructions'],
     contextWindow: 2000000
   },
-  
+
   // Legacy models (for compatibility)
   'gemini-1.5-pro': {
     description: 'Previous generation pro model',
@@ -74,7 +68,7 @@ const GEMINI_MODELS = {
 class EnhancedStdioMCPServer {
   private genAI: GoogleGenAI;
   private conversations: Map<string, any[]> = new Map();
-  
+
   constructor(apiKey: string) {
     logger.startup('Connecting to Google Gemini API...');
     this.genAI = new GoogleGenAI({ apiKey });
@@ -92,7 +86,7 @@ class EnhancedStdioMCPServer {
       crlfDelay: Infinity
     });
 
-    rl.on('line', (line) => {
+    rl.on('line', line => {
       if (line.trim()) {
         try {
           const request: MCPRequest = JSON.parse(line);
@@ -112,9 +106,10 @@ class EnhancedStdioMCPServer {
           try {
             const partialRequest = JSON.parse(line);
             if (partialRequest.id) {
-              const errorResponse = error instanceof MCPError
-                ? error.toMCPResponse(partialRequest.id)
-                : new MCPError('Invalid request format').toMCPResponse(partialRequest.id);
+              const errorResponse =
+                error instanceof MCPError
+                  ? error.toMCPResponse(partialRequest.id)
+                  : new MCPError('Invalid request format').toMCPResponse(partialRequest.id);
               this.sendResponse(errorResponse);
             }
           } catch {
@@ -124,7 +119,7 @@ class EnhancedStdioMCPServer {
       }
     });
 
-    process.stdin.on('error', (err) => {
+    process.stdin.on('error', err => {
       console.error('stdin error:', err);
     });
   }
@@ -197,7 +192,7 @@ class EnhancedStdioMCPServer {
             console.error(`Notification received: ${(request as any).method}`);
             return;
           }
-          
+
           response = {
             jsonrpc: '2.0',
             id: request.id,
@@ -491,22 +486,22 @@ class EnhancedStdioMCPServer {
     switch (name) {
       case 'generate_text':
         return await this.generateText(request.id, args);
-      
+
       case 'analyze_image':
         return await this.analyzeImage(request.id, args);
-      
+
       case 'count_tokens':
         return await this.countTokens(request.id, args);
-      
+
       case 'list_models':
         return this.listModels(request.id, args);
-      
+
       case 'embed_text':
         return await this.embedText(request.id, args);
-      
+
       case 'get_help':
         return this.getHelp(request.id, args);
-      
+
       default:
         return {
           jsonrpc: '2.0',
@@ -527,7 +522,7 @@ class EnhancedStdioMCPServer {
       const model = validatedArgs.model || 'gemini-2.5-flash';
       logger.api(`Generating text with model: ${model}`);
       const modelInfo = GEMINI_MODELS[model as keyof typeof GEMINI_MODELS];
-      
+
       if (!modelInfo) {
         throw new Error(`Unknown model: ${model}`);
       }
@@ -556,30 +551,37 @@ class EnhancedStdioMCPServer {
       // Build the request
       const requestBody: any = {
         model,
-        contents: [{
-          parts: [{
-            text: Validator.sanitizeString(validatedArgs.prompt)
-          }],
-          role: 'user'
-        }],
+        contents: [
+          {
+            parts: [
+              {
+                text: Validator.sanitizeString(validatedArgs.prompt)
+              }
+            ],
+            role: 'user'
+          }
+        ],
         generationConfig
       };
 
       // Add system instruction if provided
       if (validatedArgs.systemInstruction) {
         requestBody.systemInstruction = {
-          parts: [{
-            text: Validator.sanitizeString(validatedArgs.systemInstruction)
-          }]
+          parts: [
+            {
+              text: Validator.sanitizeString(validatedArgs.systemInstruction)
+            }
+          ]
         };
       }
 
       // Add safety settings if provided
       if (args.safetySettings) {
         try {
-          requestBody.safetySettings = typeof args.safetySettings === 'string'
-            ? JSON.parse(args.safetySettings)
-            : args.safetySettings;
+          requestBody.safetySettings =
+            typeof args.safetySettings === 'string'
+              ? JSON.parse(args.safetySettings)
+              : args.safetySettings;
         } catch (error) {
           console.error('Invalid safety settings JSON provided:', error);
         }
@@ -587,9 +589,11 @@ class EnhancedStdioMCPServer {
 
       // Add grounding if requested and supported
       if (args.grounding && modelInfo.features.includes('grounding')) {
-        requestBody.tools = [{
-          googleSearch: {}
-        }];
+        requestBody.tools = [
+          {
+            googleSearch: {}
+          }
+        ];
       }
 
       // Handle conversation context
@@ -612,9 +616,11 @@ class EnhancedStdioMCPServer {
         const history = this.conversations.get(args.conversationId) || [];
         history.push(...requestBody.contents);
         history.push({
-          parts: [{
-            text: text
-          }],
+          parts: [
+            {
+              text
+            }
+          ],
           role: 'model'
         });
         this.conversations.set(args.conversationId, history);
@@ -624,10 +630,12 @@ class EnhancedStdioMCPServer {
         jsonrpc: '2.0',
         id,
         result: {
-          content: [{
-            type: 'text',
-            text: text
-          }],
+          content: [
+            {
+              type: 'text',
+              text
+            }
+          ],
           metadata: {
             model,
             tokensUsed: result.usageMetadata?.totalTokenCount,
@@ -669,7 +677,7 @@ class EnhancedStdioMCPServer {
       } else if (args.imageBase64) {
         // Log base64 data size for debugging
         console.error(`Image base64 length: ${args.imageBase64.length}`);
-        
+
         // Extract MIME type and data
         const matches = args.imageBase64.match(/^data:(.+);base64,(.+)$/);
         if (matches) {
@@ -694,13 +702,12 @@ class EnhancedStdioMCPServer {
 
       const result = await this.genAI.models.generateContent({
         model,
-        contents: [{
-          parts: [
-            { text: args.prompt },
-            imagePart
-          ],
-          role: 'user'
-        }]
+        contents: [
+          {
+            parts: [{ text: args.prompt }, imagePart],
+            role: 'user'
+          }
+        ]
       });
 
       const text = result.text || '';
@@ -709,10 +716,12 @@ class EnhancedStdioMCPServer {
         jsonrpc: '2.0',
         id,
         result: {
-          content: [{
-            type: 'text',
-            text: text
-          }]
+          content: [
+            {
+              type: 'text',
+              text
+            }
+          ]
         }
       };
     } catch (error) {
@@ -731,25 +740,31 @@ class EnhancedStdioMCPServer {
   private async countTokens(id: any, args: any): Promise<MCPResponse> {
     try {
       const model = args.model || 'gemini-2.5-flash';
-      
+
       const result = await this.genAI.models.countTokens({
         model,
-        contents: [{
-          parts: [{
-            text: args.text
-          }],
-          role: 'user'
-        }]
+        contents: [
+          {
+            parts: [
+              {
+                text: args.text
+              }
+            ],
+            role: 'user'
+          }
+        ]
       });
 
       return {
         jsonrpc: '2.0',
         id,
         result: {
-          content: [{
-            type: 'text',
-            text: `Token count: ${result.totalTokens}`
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `Token count: ${result.totalTokens}`
+            }
+          ],
           metadata: {
             tokenCount: result.totalTokens,
             model
@@ -798,10 +813,12 @@ class EnhancedStdioMCPServer {
       jsonrpc: '2.0',
       id,
       result: {
-        content: [{
-          type: 'text',
-          text: JSON.stringify(modelList, null, 2)
-        }],
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(modelList, null, 2)
+          }
+        ],
         metadata: {
           count: modelList.length,
           filter
@@ -813,7 +830,7 @@ class EnhancedStdioMCPServer {
   private async embedText(id: any, args: any): Promise<MCPResponse> {
     try {
       const model = args.model || 'text-embedding-004';
-      
+
       const result = await this.genAI.models.embedContent({
         model,
         contents: args.text
@@ -823,13 +840,15 @@ class EnhancedStdioMCPServer {
         jsonrpc: '2.0',
         id,
         result: {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              embedding: result.embeddings?.[0]?.values || [],
-              model
-            })
-          }],
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                embedding: result.embeddings?.[0]?.values || [],
+                model
+              })
+            }
+          ],
           metadata: {
             model,
             dimensions: result.embeddings?.[0]?.values?.length || 0
@@ -850,7 +869,7 @@ class EnhancedStdioMCPServer {
 
   private async handleResourceRead(request: MCPRequest): Promise<MCPResponse> {
     const uri = request.params?.uri;
-    
+
     if (!uri) {
       return {
         jsonrpc: '2.0',
@@ -918,7 +937,7 @@ class EnhancedStdioMCPServer {
         break;
 
       case 'gemini://help/usage':
-        content = this.getHelpContent('overview') + '\n\n' + this.getHelpContent('tools');
+        content = `${this.getHelpContent('overview')}\n\n${this.getHelpContent('tools')}`;
         mimeType = 'text/markdown';
         break;
 
@@ -947,11 +966,13 @@ class EnhancedStdioMCPServer {
       jsonrpc: '2.0',
       id: request.id,
       result: {
-        contents: [{
-          uri,
-          mimeType,
-          text: content
-        }]
+        contents: [
+          {
+            uri,
+            mimeType,
+            text: content
+          }
+        ]
       }
     };
   }
@@ -1244,25 +1265,30 @@ Just ask naturally:
         break;
 
       default:
-        helpContent = 'Unknown help topic. Available topics: overview, tools, models, parameters, examples, quick-start';
+        helpContent =
+          'Unknown help topic. Available topics: overview, tools, models, parameters, examples, quick-start';
     }
 
     return {
       jsonrpc: '2.0',
       id,
       result: {
-        content: [{
-          type: 'text',
-          text: helpContent
-        }]
+        content: [
+          {
+            type: 'text',
+            text: helpContent
+          }
+        ]
       }
     };
   }
 
   private sendResponse(response: MCPResponse | any) {
     const responseStr = JSON.stringify(response);
-    logger.response(`Sending response for ID: ${response.id} ${response.error ? '(ERROR)' : '(SUCCESS)'}`);
-    process.stdout.write(responseStr + '\n');
+    logger.response(
+      `Sending response for ID: ${response.id} ${response.error ? '(ERROR)' : '(SUCCESS)'}`
+    );
+    process.stdout.write(`${responseStr}\n`);
   }
 }
 
@@ -1272,9 +1298,10 @@ try {
   logger.info('Environment configuration loaded');
 
   // Mask the API key for security (show only first 8 and last 4 characters)
-  const maskedKey = config.geminiApiKey.length > 12
-    ? `${config.geminiApiKey.substring(0, 8)}...${config.geminiApiKey.substring(config.geminiApiKey.length - 4)}`
-    : '***masked***';
+  const maskedKey =
+    config.geminiApiKey.length > 12
+      ? `${config.geminiApiKey.substring(0, 8)}...${config.geminiApiKey.substring(config.geminiApiKey.length - 4)}`
+      : '***masked***';
 
   logger.success(`API Key loaded: ${maskedKey}`);
   logger.info(`Log level: ${config.logLevel}`);
@@ -1286,7 +1313,7 @@ try {
 
   logger.startup('Initializing Gemini API connection...');
 
-  const server = new EnhancedStdioMCPServer(config.geminiApiKey);
+  new EnhancedStdioMCPServer(config.geminiApiKey);
 
   logger.success('Gemini MCP Server started successfully!');
   logger.info('Server is ready to receive MCP requests');
@@ -1305,7 +1332,6 @@ try {
     rateLimiter.destroy();
     process.exit(0);
   });
-
 } catch (error) {
   logger.error('Failed to start server:', error);
   process.exit(1);

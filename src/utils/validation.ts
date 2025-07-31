@@ -31,7 +31,7 @@ export const CommonSchemas = {
   conversationId: z.string().min(1).max(100),
 
   // JSON schema string
-  jsonSchema: z.string().refine((val) => {
+  jsonSchema: z.string().refine(val => {
     try {
       JSON.parse(val);
       return true;
@@ -41,7 +41,7 @@ export const CommonSchemas = {
   }, 'Must be valid JSON'),
 
   // Safety settings string
-  safetySettings: z.string().refine((val) => {
+  safetySettings: z.string().refine(val => {
     try {
       const parsed = JSON.parse(val);
       return Array.isArray(parsed);
@@ -51,10 +51,12 @@ export const CommonSchemas = {
   }, 'Must be valid JSON array'),
 
   // Base64 image data
-  base64Image: z.string().regex(/^data:image\/(png|jpeg|jpg|gif|webp);base64,/, 'Must be valid base64 image data'),
+  base64Image: z
+    .string()
+    .regex(/^data:image\/(png|jpeg|jpg|gif|webp);base64,/, 'Must be valid base64 image data'),
 
   // URL validation
-  imageUrl: z.string().url('Must be a valid URL'),
+  imageUrl: z.string().url('Must be a valid URL')
 };
 
 /**
@@ -73,36 +75,40 @@ export const ToolSchemas = {
     jsonSchema: CommonSchemas.jsonSchema.optional(),
     grounding: z.boolean().optional(),
     safetySettings: CommonSchemas.safetySettings.optional(),
-    conversationId: CommonSchemas.conversationId.optional(),
+    conversationId: CommonSchemas.conversationId.optional()
   }),
 
-  analyzeImage: z.object({
-    prompt: z.string().min(1, 'Prompt is required'),
-    imageUrl: CommonSchemas.imageUrl.optional(),
-    imageBase64: CommonSchemas.base64Image.optional(),
-    model: z.enum(['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash']).optional(),
-  }).refine(
-    (data) => data.imageUrl || data.imageBase64,
-    'Either imageUrl or imageBase64 must be provided'
-  ),
+  analyzeImage: z
+    .object({
+      prompt: z.string().min(1, 'Prompt is required'),
+      imageUrl: CommonSchemas.imageUrl.optional(),
+      imageBase64: CommonSchemas.base64Image.optional(),
+      model: z.enum(['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash']).optional()
+    })
+    .refine(
+      data => data.imageUrl || data.imageBase64,
+      'Either imageUrl or imageBase64 must be provided'
+    ),
 
   countTokens: z.object({
     text: z.string().min(1, 'Text is required'),
-    model: CommonSchemas.geminiModel.optional(),
+    model: CommonSchemas.geminiModel.optional()
   }),
 
   listModels: z.object({
-    filter: z.enum(['all', 'thinking', 'vision', 'grounding', 'json_mode']).optional(),
+    filter: z.enum(['all', 'thinking', 'vision', 'grounding', 'json_mode']).optional()
   }),
 
   embedText: z.object({
     text: z.string().min(1, 'Text is required'),
-    model: z.enum(['text-embedding-004', 'text-multilingual-embedding-002']).optional(),
+    model: z.enum(['text-embedding-004', 'text-multilingual-embedding-002']).optional()
   }),
 
   getHelp: z.object({
-    topic: z.enum(['overview', 'tools', 'models', 'parameters', 'examples', 'quick-start']).optional(),
-  }),
+    topic: z
+      .enum(['overview', 'tools', 'models', 'parameters', 'examples', 'quick-start'])
+      .optional()
+  })
 };
 
 /**
@@ -117,9 +123,9 @@ export class Validator {
       return schema.parse(params);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const issues = error.issues.map(issue => 
-          `${issue.path.join('.')}: ${issue.message}`
-        ).join(', ');
+        const issues = error.issues
+          .map(issue => `${issue.path.join('.')}: ${issue.message}`)
+          .join(', ');
         throw new ValidationError(`Invalid parameters: ${issues}`);
       }
       throw error;
@@ -139,6 +145,7 @@ export class Validator {
     }
 
     // Remove null bytes and other control characters except newlines and tabs
+    // eslint-disable-next-line no-control-regex
     return input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   }
 

@@ -54,7 +54,10 @@ export class TimeoutError extends MCPError {
 }
 
 export class GeminiAPIError extends MCPError {
-  constructor(message: string, public originalError?: any) {
+  constructor(
+    message: string,
+    public originalError?: any
+  ) {
     super(message, -32603);
     this.name = 'GeminiAPIError';
     this.data = originalError;
@@ -69,7 +72,7 @@ export class ErrorHandler {
     if (error?.error) {
       const geminiError = error.error;
       let message = 'Gemini API error';
-      
+
       if (geminiError.message) {
         message = geminiError.message;
       } else if (geminiError.status) {
@@ -86,11 +89,13 @@ export class ErrorHandler {
     if (error instanceof GeminiAPIError) {
       const status = error.originalError?.status;
       // Retry on server errors and rate limits
-      return status === 'UNAVAILABLE' || 
-             status === 'RESOURCE_EXHAUSTED' ||
-             status === 'INTERNAL' ||
-             error.originalError?.code === 503 ||
-             error.originalError?.code === 429;
+      return (
+        status === 'UNAVAILABLE' ||
+        status === 'RESOURCE_EXHAUSTED' ||
+        status === 'INTERNAL' ||
+        error.originalError?.code === 503 ||
+        error.originalError?.code === 429
+      );
     }
     return false;
   }
@@ -121,7 +126,7 @@ export async function withRetry<T>(
         throw error;
       }
 
-      const delay = ErrorHandler.getRetryDelay(attempt);
+      const delay = baseDelay * Math.pow(2, attempt);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
