@@ -48,8 +48,8 @@ npm install -g mcp-server-gemini
 
 #### Option 2: Local Development
 ```bash
-git clone https://github.com/gurr-i/mcp-server-gemini.git
-cd mcp-server-gemini
+git clone https://github.com/gurr-i/mcp-server-gemini-pro.git
+cd mcp-server-gemini-pro
 npm install
 npm run build
 ```
@@ -92,7 +92,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "gemini": {
       "command": "node",
-      "args": ["/path/to/mcp-server-gemini/dist/enhanced-stdio-server.js"],
+      "args": ["/path/to/mcp-server-gemini-pro/dist/enhanced-stdio-server.js"],
       "env": {
         "GEMINI_API_KEY": "your_api_key_here"
       }
@@ -238,8 +238,8 @@ ENABLE_METRICS=true
   "mcpServers": {
     "gemini": {
       "command": "node",
-      "args": ["/path/to/mcp-server-gemini/dist/enhanced-stdio-server.js"],
-      "cwd": "/path/to/mcp-server-gemini",
+      "args": ["/path/to/mcp-server-gemini-pro/dist/enhanced-stdio-server.js"],
+      "cwd": "/path/to/mcp-server-gemini-pro",
       "env": {
         "GEMINI_API_KEY": "your_api_key_here",
         "NODE_ENV": "development",
@@ -285,8 +285,8 @@ ENABLE_METRICS=true
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/gurr-i/mcp-server-gemini.git
-cd mcp-server-gemini
+git clone https://github.com/gurr-i/mcp-server-gemini-pro.git
+cd mcp-server-gemini-pro
 
 # Install dependencies
 npm install
@@ -538,8 +538,8 @@ GEMINI_API_KEY=your_key mcp-server-gemini
 ### 2. Local Installation
 ```bash
 # Clone and build
-git clone https://github.com/gurr-i/mcp-server-gemini.git
-cd mcp-server-gemini
+git clone https://github.com/gurr-i/mcp-server-gemini-pro.git
+cd mcp-server-gemini-pro
 npm install
 npm run build
 
@@ -550,11 +550,11 @@ GEMINI_API_KEY=your_key npm start
 ### 3. Docker Deployment
 ```bash
 # Using Docker Hub (when published)
-docker run -e GEMINI_API_KEY=your_key mcp-server-gemini:latest
+docker run -e GEMINI_API_KEY=your_key mcp-server-gemini-pro:latest
 
 # Using local build
-docker build -t mcp-server-gemini .
-docker run -e GEMINI_API_KEY=your_key mcp-server-gemini
+docker build -t mcp-server-gemini-pro .
+docker run -e GEMINI_API_KEY=your_key mcp-server-gemini-pro
 ```
 
 ### 4. Process Manager (PM2)
@@ -643,8 +643,8 @@ npm start
 ```
 
 ### Getting Help
-- 🐛 [Report Issues](https://github.com/gurr-i/mcp-server-gemini/issues)
-- 💬 [Discussions](https://github.com/gurr-i/mcp-server-gemini/discussions)
+- 🐛 [Report Issues](https://github.com/gurr-i/mcp-server-gemini-pro/issues)
+- 💬 [Discussions](https://github.com/gurr-i/mcp-server-gemini-pro/discussions)
 - 📚 [Documentation](docs/)
 
 ## 🔒 Security
@@ -701,8 +701,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-- 🐛 [Report Issues](https://github.com/gurr-i/mcp-server-gemini/issues)
-- 💬 [Discussions](https://github.com/gurr-i/mcp-server-gemini/discussions)
+- 🐛 [Report Issues](https://github.com/gurr-i/mcp-server-gemini-pro/issues)
+- 💬 [Discussions](https://github.com/gurr-i/mcp-server-gemini-pro/discussions)
 - 📧 [Email Support](mailto:gopal@ph.iitr.ac.in)
 
 ---
